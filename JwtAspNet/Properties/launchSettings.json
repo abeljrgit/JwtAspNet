@@ -1,0 +1,34 @@
+{
+  "profiles": {
+    "JwtAspNet": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings:DevJwtAspNetDbConnection": "TrustServerCertificate=True;Server=ALKHWARIZMI-PC;Database=JwtAspNetDb;Trusted_Connection=True",
+        "ConnectionStrings:UatJwtAspNetDbConnection": "N/A",
+        "ConnectionStrings:ProdJwtAspNetDbConnection": "N/A"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7222;http://localhost:5193"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:8679",
+      "sslPort": 44383
+    }
+  }
+}
