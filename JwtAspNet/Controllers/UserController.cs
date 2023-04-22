@@ -1,5 +1,6 @@
 ﻿using JwtAspNet.Dto;
 using JwtAspNet.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtAspNet.Controllers
@@ -29,7 +30,13 @@ namespace JwtAspNet.Controllers
             if (user.Item1 == null)
                 return BadRequest(user.Item2);
 
-            return Ok(user.Item1);
+            return Ok(user.Item2);
+        }
+
+        [HttpGet("test"), Authorize]
+        public async Task<string> test()
+        {
+            return "THIS IS TEST CONTROLLER --ABEL";
         }
     }
 }
