@@ -17,24 +17,29 @@ namespace JwtAspNet.Controllers
         }
 
         [HttpPost("register")]
-        public async Task registerUser(RegisterDto registerDto)
+        public async Task<ActionResult<RegisterResponseDto>> registerUser(RegisterRequestDto registerDto)
         {
-            await _userService.RegisterUser(registerDto);
+            RegisterResponseDto? user = await _userService.RegisterUser(registerDto);
+
+            if (user == null)
+                return BadRequest("Something bad happened.");
+
+            return Ok(user);
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> loginUser(LoginDto loginDto)
+        public async Task<ActionResult<LoginResponseDto>> loginUser(LoginRequestDto loginDto)
         {
-            Tuple<UserDto?, string> user = await _userService.LoginUser(loginDto);
+            Tuple<LoginResponseDto?, string> user = await _userService.LoginUser(loginDto);
 
             if (user.Item1 == null)
                 return BadRequest(user.Item2);
 
-            return Ok(user.Item2);
+            return Ok(user.Item1);
         }
 
         [HttpGet("test"), Authorize]
-        public async Task<string> test()
+        public string test()
         {
             return "THIS IS TEST CONTROLLER --ABEL";
         }

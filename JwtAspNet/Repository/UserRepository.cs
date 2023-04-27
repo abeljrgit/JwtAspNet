@@ -12,16 +12,20 @@ namespace JwtAspNet.Repository
             _jwtAspNetDbcontext = jwtAspNetDbcontext;
         }
 
-        public async Task RegisterUser(User user)
+        public async Task<List<User>> RegisterUser(User user)
         {
             await _jwtAspNetDbcontext.Users.AddAsync(user);
             await _jwtAspNetDbcontext.SaveChangesAsync();
+
+            return await _jwtAspNetDbcontext.Users
+                .Where(u => u.Email == user.Email)
+                .ToListAsync();
         }
 
         public async Task<List<User>> LoginUser(string userEmail)
         {
             return await _jwtAspNetDbcontext.Users
-                .Where(user => user.Email == userEmail)
+                .Where(u => u.Email == userEmail)
                 .ToListAsync();
         }
     }

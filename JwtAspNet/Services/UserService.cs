@@ -22,7 +22,7 @@ namespace JwtAspNet.Services
             _configuration = configuration;
         }
 
-        public async Task RegisterUser(RegisterDto registerDto)
+        public async Task<RegisterResponseDto?> RegisterUser(RegisterRequestDto registerDto)
         {
             User user = new User();
 
@@ -33,21 +33,36 @@ namespace JwtAspNet.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            await _userRepository.RegisterUser(user);
+            List<User> returnedUserData = await _userRepository.RegisterUser(user);
+
+            if (returnedUserData[0] != null || returnedUserData.Count == 0)
+            {
+                Tuple<User, string> tupleUserAndString = Tuple.Create(returnedUserData[0], CreateToken(returnedUserData[0]));
+
+                return _mapper.Map<RegisterResponseDto>(tupleUserAndString);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public async Task<Tuple<UserDto?, string>> LoginUser(LoginDto loginDto)
+        public async Task<Tuple<LoginResponseDto?, string>> LoginUser(LoginRequestDto loginDto)
         {
-            var user = await _userRepository.LoginUser(loginDto.Email);
+            List<User> user = await _userRepository.LoginUser(loginDto.Email);
 
-            if (user == null || user.Count == 0)
-                return Tuple.Create<UserDto?, string>(null, "Please check your Email or Password");
+            if (user[0] == null || user.Count == 0)
+                return Tuple.Create<LoginResponseDto?, string>(null, "Please check your Email or Password");
             else
             {
                 if (VerifyPasswordHash(loginDto.Password, user[0].PasswordHash, user[0].PasswordSalt))
-                    return Tuple.Create<UserDto?, string>(_mapper.Map<UserDto>(user[0]), "Success, Your Token: " + CreateToken(user[0]));
+                {
+                    Tuple<User, string> tupleUserAndString = Tuple.Create(user[0], CreateToken(user[0]));
+
+                    return Tuple.Create<LoginResponseDto?, string>(_mapper.Map<LoginResponseDto>(tupleUserAndString), "Success!!!");
+                }
                 else
-                    return Tuple.Create<UserDto?, string>(null, "Please check your Employee Id or Password");
+                    return Tuple.Create<LoginResponseDto?, string>(null, "Please check your Employee Id or Password");
             }
         }
 
@@ -58,8 +73,9 @@ namespace JwtAspNet.Services
                 new Claim(ClaimTypes.Name,user.Email)
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            var appSettingsToken = _configuration.GetSection("AppSettings:Token").Value;
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(appSettingsToken));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
